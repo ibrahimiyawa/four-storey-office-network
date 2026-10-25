@@ -1,0 +1,32 @@
+hostname R4
+no ip domain-lookup
+enable secret <ENABLE_SECRET>
+ip domain-name office.local
+
+interface GigabitEthernet0/0
+ description To DSW4 (distribution)
+ ip address 192.168.0.221 255.255.255.252
+ no shutdown
+interface GigabitEthernet0/1
+ description Ring link to R3
+ ip address 192.168.0.202 255.255.255.252
+ no shutdown
+interface GigabitEthernet0/2
+ description Ring link to R1
+ ip address 192.168.0.205 255.255.255.252
+ no shutdown
+
+router ospf 1
+ router-id 4.4.4.4
+ network 192.168.0.220 0.0.0.3 area 0
+ network 192.168.0.200 0.0.0.3 area 0
+ network 192.168.0.204 0.0.0.3 area 0
+
+username admin privilege 15 secret <ADMIN_PASSWORD>
+crypto key generate rsa modulus 1024
+ip ssh version 2
+line vty 0 4
+ login local
+ transport input ssh
+end
+write memory

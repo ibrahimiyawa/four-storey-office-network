@@ -1,0 +1,63 @@
+hostname DSW1
+ip routing
+no ip domain-lookup
+enable secret <ENABLE_SECRET>
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name RESEARCH
+vlan 30
+ name HR
+
+ip dhcp excluded-address 192.168.0.1
+ip dhcp excluded-address 192.168.0.17
+ip dhcp excluded-address 192.168.0.33
+ip dhcp pool MANAGEMENT
+ network 192.168.0.0 255.255.255.240
+ default-router 192.168.0.1
+ip dhcp pool RESEARCH
+ network 192.168.0.16 255.255.255.240
+ default-router 192.168.0.17
+ip dhcp pool HR
+ network 192.168.0.32 255.255.255.240
+ default-router 192.168.0.33
+
+interface Vlan10
+ description Management gateway
+ ip address 192.168.0.1 255.255.255.240
+ no shutdown
+interface Vlan20
+ description Research gateway
+ ip address 192.168.0.17 255.255.255.240
+ no shutdown
+interface Vlan30
+ description Human Resources gateway
+ ip address 192.168.0.33 255.255.255.240
+ no shutdown
+
+interface GigabitEthernet0/1
+ description To R1
+ no switchport
+ ip address 192.168.0.210 255.255.255.252
+ no shutdown
+
+interface range FastEthernet0/1 - 2
+ description To ACC1
+ channel-group 1 mode on
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+
+router ospf 1
+ router-id 11.11.11.11
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ network 192.168.0.0 0.0.0.15 area 0
+ network 192.168.0.16 0.0.0.15 area 0
+ network 192.168.0.32 0.0.0.15 area 0
+ network 192.168.0.208 0.0.0.3 area 0
+
+end
+write memory

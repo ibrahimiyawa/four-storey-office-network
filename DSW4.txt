@@ -1,0 +1,63 @@
+hostname DSW4
+ip routing
+no ip domain-lookup
+enable secret <ENABLE_SECRET>
+
+vlan 100
+ name ADMIN
+vlan 110
+ name ICT
+vlan 120
+ name SERVER_ROOM
+
+ip dhcp excluded-address 192.168.0.145
+ip dhcp excluded-address 192.168.0.161
+ip dhcp excluded-address 192.168.0.177
+ip dhcp pool ADMIN
+ network 192.168.0.144 255.255.255.240
+ default-router 192.168.0.145
+ip dhcp pool ICT
+ network 192.168.0.160 255.255.255.240
+ default-router 192.168.0.161
+ip dhcp pool SERVER_ROOM
+ network 192.168.0.176 255.255.255.240
+ default-router 192.168.0.177
+
+interface Vlan100
+ description Administration gateway
+ ip address 192.168.0.145 255.255.255.240
+ no shutdown
+interface Vlan110
+ description ICT gateway
+ ip address 192.168.0.161 255.255.255.240
+ no shutdown
+interface Vlan120
+ description Server Room gateway
+ ip address 192.168.0.177 255.255.255.240
+ no shutdown
+
+interface GigabitEthernet0/1
+ description To R4
+ no switchport
+ ip address 192.168.0.222 255.255.255.252
+ no shutdown
+
+interface range FastEthernet0/1 - 2
+ description To ACC4
+ channel-group 1 mode on
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 100,110,120
+
+router ospf 1
+ router-id 14.14.14.14
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ network 192.168.0.144 0.0.0.15 area 0
+ network 192.168.0.160 0.0.0.15 area 0
+ network 192.168.0.176 0.0.0.15 area 0
+ network 192.168.0.220 0.0.0.3 area 0
+
+end
+write memory

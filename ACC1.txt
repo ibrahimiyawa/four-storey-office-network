@@ -1,0 +1,32 @@
+hostname ACC1
+no ip domain-lookup
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name RESEARCH
+vlan 30
+ name HR
+
+interface range FastEthernet0/1 - 2
+ description Management: PCs Fa0/1-2
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+interface range FastEthernet0/3 - 4
+ description Research: PC Fa0/3, printer Fa0/4
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+interface range FastEthernet0/5 - 6
+ description Human Resources: PC Fa0/5, printer Fa0/6
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+interface range FastEthernet0/23 - 24
+ description Uplink to DSW1
+ channel-group 1 mode on
+interface Port-channel1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+end
+write memory

@@ -1,0 +1,63 @@
+hostname DSW3
+ip routing
+no ip domain-lookup
+enable secret <ENABLE_SECRET>
+
+vlan 70
+ name LOGISTICS_SUPPLY
+vlan 80
+ name CUSTOMER_CARE
+vlan 90
+ name GUEST
+
+ip dhcp excluded-address 192.168.0.97
+ip dhcp excluded-address 192.168.0.113
+ip dhcp excluded-address 192.168.0.129
+ip dhcp pool LOGISTICS_SUPPLY
+ network 192.168.0.96 255.255.255.240
+ default-router 192.168.0.97
+ip dhcp pool CUSTOMER_CARE
+ network 192.168.0.112 255.255.255.240
+ default-router 192.168.0.113
+ip dhcp pool GUEST
+ network 192.168.0.128 255.255.255.240
+ default-router 192.168.0.129
+
+interface Vlan70
+ description Logistics & Supply gateway
+ ip address 192.168.0.97 255.255.255.240
+ no shutdown
+interface Vlan80
+ description Customer Care gateway
+ ip address 192.168.0.113 255.255.255.240
+ no shutdown
+interface Vlan90
+ description Guest Area gateway
+ ip address 192.168.0.129 255.255.255.240
+ no shutdown
+
+interface GigabitEthernet0/1
+ description To R3
+ no switchport
+ ip address 192.168.0.218 255.255.255.252
+ no shutdown
+
+interface range FastEthernet0/1 - 2
+ description To ACC3
+ channel-group 1 mode on
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 70,80,90
+
+router ospf 1
+ router-id 13.13.13.13
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ network 192.168.0.96 0.0.0.15 area 0
+ network 192.168.0.112 0.0.0.15 area 0
+ network 192.168.0.128 0.0.0.15 area 0
+ network 192.168.0.216 0.0.0.3 area 0
+
+end
+write memory

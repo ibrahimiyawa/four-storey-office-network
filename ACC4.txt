@@ -1,0 +1,32 @@
+hostname ACC4
+no ip domain-lookup
+vlan 100
+ name ADMIN
+vlan 110
+ name ICT
+vlan 120
+ name SERVER_ROOM
+
+interface range FastEthernet0/1 - 2
+ description Administration: PCs Fa0/1-2
+ switchport mode access
+ switchport access vlan 100
+ spanning-tree portfast
+interface range FastEthernet0/3 - 4
+ description ICT: PC Fa0/3, printer Fa0/4
+ switchport mode access
+ switchport access vlan 110
+ spanning-tree portfast
+interface range FastEthernet0/5 - 6
+ description Server Room: PC Fa0/5, printer Fa0/6
+ switchport mode access
+ switchport access vlan 120
+ spanning-tree portfast
+interface range FastEthernet0/23 - 24
+ description Uplink to DSW4
+ channel-group 1 mode on
+interface Port-channel1
+ switchport mode trunk
+ switchport trunk allowed vlan 100,110,120
+end
+write memory

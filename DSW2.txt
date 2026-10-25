@@ -1,0 +1,63 @@
+hostname DSW2
+ip routing
+no ip domain-lookup
+enable secret <ENABLE_SECRET>
+
+vlan 40
+ name MARKETING
+vlan 50
+ name ACCOUNTING
+vlan 60
+ name FINANCE
+
+ip dhcp excluded-address 192.168.0.49
+ip dhcp excluded-address 192.168.0.65
+ip dhcp excluded-address 192.168.0.81
+ip dhcp pool MARKETING
+ network 192.168.0.48 255.255.255.240
+ default-router 192.168.0.49
+ip dhcp pool ACCOUNTING
+ network 192.168.0.64 255.255.255.240
+ default-router 192.168.0.65
+ip dhcp pool FINANCE
+ network 192.168.0.80 255.255.255.240
+ default-router 192.168.0.81
+
+interface Vlan40
+ description Marketing gateway
+ ip address 192.168.0.49 255.255.255.240
+ no shutdown
+interface Vlan50
+ description Accounting gateway
+ ip address 192.168.0.65 255.255.255.240
+ no shutdown
+interface Vlan60
+ description Finance gateway
+ ip address 192.168.0.81 255.255.255.240
+ no shutdown
+
+interface GigabitEthernet0/1
+ description To R2
+ no switchport
+ ip address 192.168.0.214 255.255.255.252
+ no shutdown
+
+interface range FastEthernet0/1 - 2
+ description To ACC2
+ channel-group 1 mode on
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 40,50,60
+
+router ospf 1
+ router-id 12.12.12.12
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ network 192.168.0.48 0.0.0.15 area 0
+ network 192.168.0.64 0.0.0.15 area 0
+ network 192.168.0.80 0.0.0.15 area 0
+ network 192.168.0.212 0.0.0.3 area 0
+
+end
+write memory
